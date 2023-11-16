@@ -14,7 +14,6 @@ watch = true
 
 stack_name = "sam-app"
 s3_prefix = "sam-app"
-region = [default]
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
 image_repositories = []
