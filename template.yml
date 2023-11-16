@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template for xml and json payload conversion
+
+Resources:
+  DependendenciesLayer:
+    Type: AWS::Serverless::LayerVersion 
+    Properties:
+      LayerName: transformers
+      Description: Dependências da função Lambda
+      ContentUri: ./dependencies.zip
+      CompatibleRuntimes:
+        - python3.9
+  
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "soap-transformer-${AWS::StackName}-${AWS::AccountId}"
+      
+  ReadAccessToTransformerFilesRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: ReadAccessToTransformerFilesPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: !Sub "arn:aws:s3:::${S3Bucket}/*"
+        
+  PayloadTransformerFunction: 
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: xslt-transformer
+      Runtime: python3.9
+      Handler: app.lambda_handler
+      CodeUri: function/
+      Layers:
+        - !Ref DependendenciesLayer
+      Role: 
+        Fn::GetAtt:
+          - ReadAccessToTransformerFilesRole
+          - Arn
+      Timeout: 60
+      Environment:
+        Variables:
+          xsltrq: !Sub "s3://${S3Bucket}/xml2json.xslt"
+          xsltrs: !Sub "s3://${S3Bucket}/json2xml.xslt"
+      
+  LambdaPolicyForAPIGW:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref PayloadTransformerFunction
+      Principal: apigateway.amazonaws.com
+
+  API:  
+    Type: AWS::Serverless::Api
+    Properties:
+      EndpointConfiguration: REGIONAL
+      StageName: "stage"
+      DefinitionUri: openapi.yaml
+      
+Outputs:
+  BucketName:
+    Value: !Ref S3Bucket
