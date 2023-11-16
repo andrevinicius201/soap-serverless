@@ -1,9 +1,20 @@
 version = 0.1
-[default.deploy.parameters]
+[default]
+[default.global]
+[default.global.parameters]
 stack_name = "sam-app"
+
+[default.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
 resolve_s3 = true
+
+[default.sync.parameters]
+watch = true
+
+stack_name = "sam-app"
 s3_prefix = "sam-app"
-region = "us-east-1"
+region = [default]
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
 image_repositories = []
