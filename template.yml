@@ -15,7 +15,7 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "soap-transformer-${AWS::StackName}-${AWS::AccountId}"
+      BucketName: !Sub "soap-transformer-${AWS::AccountId}"
       
   ReadAccessToTransformerFilesRole:
     Type: AWS::IAM::Role
