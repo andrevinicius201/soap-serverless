@@ -26,3 +26,5 @@ else
         > output.txt
   echo Setup complete
 fi
+ACC_ID=$(aws sts get-caller-identity | jq -r '.Account')
+aws s3 cp ./xslt s3://soap-transformer-$ACC_ID/xslt --recursive
