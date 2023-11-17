@@ -16,7 +16,8 @@ sudo ./configure --enable-optimizations
 sudo make altinstall
 cd ..
 cd soap-serverless/
-sam build && sam deploy
+sam build
+sam deploy --no-confirm-changeset
 if [ -z "$endpoint" ]; then
   echo "Setup is complete"
 else
