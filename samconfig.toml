@@ -2,7 +2,7 @@ version = 0.1
 [default]
 [default.global]
 [default.global.parameters]
-stack_name = "sam-app"
+stack_name = "soap-pattern"
 
 [default.deploy.parameters]
 capabilities = "CAPABILITY_IAM"
@@ -12,7 +12,7 @@ resolve_s3 = true
 [default.sync.parameters]
 watch = true
 
-stack_name = "sam-app"
-s3_prefix = "sam-app"
+stack_name = "soap-pattern"
+s3_prefix = "soap-pattern"
 confirm_changeset = true
 image_repositories = []
