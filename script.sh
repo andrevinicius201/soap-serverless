@@ -22,7 +22,7 @@ if [ -z "$endpoint" ]; then
   echo "Setup is complete"
 else
     env_vars_key_value_upsert=(
-    "endpoint" $endpoint
+    "endpoint" "$endpoint"
     )
     existing_env_vars=$(aws lambda get-function-configuration \
         --function-name xslt-transformer \
