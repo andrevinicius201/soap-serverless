@@ -25,7 +25,7 @@ else
     "endpoint" $endpoint
     )
     existing_env_vars=$(aws lambda get-function-configuration \
-        --function-name funcao-mavi \
+        --function-name xslt-transformer \
         --query 'Environment.Variables' \
         --output json)
     updated_env_vars="$existing_env_vars"
@@ -35,7 +35,7 @@ else
         '.[$key] = $value')
     done
     aws lambda update-function-configuration \
-        --function-name funcao-mavi \
+        --function-name xslt-transformer \
         --environment "{\"Variables\": $updated_env_vars}"
 fi
 
