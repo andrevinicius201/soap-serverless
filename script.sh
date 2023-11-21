@@ -16,7 +16,7 @@ cd Python-3.9.16
 sudo ./configure --enable-optimizations
 sudo make altinstall
 cd ..
-cd cd soap-serverless-main/
+cd soap-serverless-main/
 sam build
 sam deploy --no-confirm-changeset
 if [ -z "$endpoint" ]; then
