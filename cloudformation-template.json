@@ -1,0 +1,191 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Template for xml and json payload conversion",
+    "Outputs": {
+      "BucketName": {
+        "Value": {
+          "Ref": "S3Bucket"
+        }
+      }
+    },
+    "Resources": {
+      "AssetsBucket": {
+        "Type": "AWS::S3::Bucket",
+        "Properties": {
+            "BucketName": {
+            "Fn::Sub": "assets-soap-pattern-${AWS::AccountId}"
+            }
+        },
+        "Metadata": {
+            "SamResourceId": "AssetsBucket"
+        }
+      },
+      "API": {
+        "Type": "AWS::ApiGateway::RestApi",
+        "Metadata": {
+          "SamResourceId": "API"
+        },
+        "Properties": {
+          "BodyS3Location": {
+            "Bucket": "api-specification-aws",
+            "Key": "openapi"
+          },
+          "Parameters": {
+            "endpointConfigurationTypes": "REGIONAL"
+          },
+          "EndpointConfiguration": {
+            "Types": [
+              "REGIONAL"
+            ]
+          }
+        }
+      },
+      "APIstageStage": {
+        "Type": "AWS::ApiGateway::Stage",
+        "Properties": {
+          "DeploymentId": {
+            "Ref": "APIDeployment4024e8f0fd"
+          },
+          "RestApiId": {
+            "Ref": "API"
+          },
+          "StageName": "stage"
+        }
+      },
+      "ReadAccessToTransformerFilesRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": [
+                    "lambda.amazonaws.com"
+                  ]
+                },
+                "Action": [
+                  "sts:AssumeRole"
+                ]
+              }
+            ]
+          },
+          "Policies": [
+            {
+              "PolicyName": "ReadAccessToTransformerFilesPolicy",
+              "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Action": [
+                      "s3:GetObject"
+                    ],
+                    "Resource": {
+                      "Fn::Sub": "arn:aws:s3:::${S3Bucket}/*"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "Metadata": {
+          "SamResourceId": "ReadAccessToTransformerFilesRole"
+        }
+      },
+      "DependendenciesLayer100f2af442": {
+        "Type": "AWS::Lambda::LayerVersion",
+        "DeletionPolicy": "Retain",
+        "Properties": {
+          "Content": {
+            "S3Bucket": "assets-soap-pattern-${AWS::AccountId}",
+            "S3Key": "dependencies.zip"
+          },
+          "Description": "Depend?ncias da fun??o Lambda",
+          "LayerName": "transformers",
+          "CompatibleRuntimes": [
+            "python3.9"
+          ]
+        }
+      },
+      "PayloadTransformerFunction": {
+        "Type": "AWS::Lambda::Function",
+        "Metadata": {
+          "SamResourceId": "PayloadTransformerFunction"
+        },
+        "Properties": {
+          "Code": {
+            "S3Bucket": "assets-soap-pattern-${AWS::AccountId}",
+            "S3Key": "lambda-code.zip"
+          },
+          "FunctionName": "xslt-transformer",
+          "Handler": "app.lambda_handler",
+          "Role": {
+            "Fn::GetAtt": [
+              "ReadAccessToTransformerFilesRole",
+              "Arn"
+            ]
+          },
+          "Runtime": "python3.9",
+          "Timeout": 60,
+          "Environment": {
+            "Variables": {
+              "xsltrq": {
+                "Fn::Sub": "s3://${S3Bucket}/xml2json.xslt"
+              },
+              "xsltrs": {
+                "Fn::Sub": "s3://${S3Bucket}/json2xml.xslt"
+              }
+            }
+          },
+          "Tags": [
+            {
+              "Key": "lambda:createdBy",
+              "Value": "SAM"
+            }
+          ],
+          "Layers": [
+            {
+              "Ref": "DependendenciesLayer100f2af442"
+            }
+          ]
+        }
+      },
+      "LambdaPolicyForAPIGW": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+          "Action": "lambda:InvokeFunction",
+          "FunctionName": {
+            "Ref": "PayloadTransformerFunction"
+          },
+          "Principal": "apigateway.amazonaws.com"
+        },
+        "Metadata": {
+          "SamResourceId": "LambdaPolicyForAPIGW"
+        }
+      },
+      "S3Bucket": {
+        "Type": "AWS::S3::Bucket",
+        "Properties": {
+          "BucketName": {
+            "Fn::Sub": "soap-transformer-${AWS::AccountId}"
+          }
+        },
+        "Metadata": {
+          "SamResourceId": "S3Bucket"
+        }
+      },
+      "APIDeployment4024e8f0fd": {
+        "Type": "AWS::ApiGateway::Deployment",
+        "Properties": {
+          "Description": "RestApi deployment id: 4024e8f0fdf768e98d0a12190b0c1e51b94c6ce8",
+          "RestApiId": {
+            "Ref": "API"
+          },
+          "StageName": "Stage"
+        }
+      }
+    }
+  }
