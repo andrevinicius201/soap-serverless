@@ -9,17 +9,6 @@
       }
     },
     "Resources": {
-      "AssetsBucket": {
-        "Type": "AWS::S3::Bucket",
-        "Properties": {
-            "BucketName": {
-            "Fn::Sub": "assets-soap-pattern-${AWS::AccountId}"
-            }
-        },
-        "Metadata": {
-            "SamResourceId": "AssetsBucket"
-        }
-      },
       "API": {
         "Type": "AWS::ApiGateway::RestApi",
         "Metadata": {
@@ -27,7 +16,10 @@
         },
         "Properties": {
           "BodyS3Location": {
-            "Bucket": "api-specification-aws",
+            "Bucket": 
+            {
+                "Fn::Sub": "assets-soap-pattern-${AWS::AccountId}"
+            },
             "Key": "openapi.yaml"
           },
           "Parameters": {
@@ -95,15 +87,18 @@
           "SamResourceId": "ReadAccessToTransformerFilesRole"
         }
       },
-      "DependendenciesLayer100f2af442": {
+      "DependendenciesLayer": {
         "Type": "AWS::Lambda::LayerVersion",
         "DeletionPolicy": "Retain",
         "Properties": {
           "Content": {
-            "S3Bucket": "assets-soap-pattern-${AWS::AccountId}",
+            "S3Bucket": 
+            {
+                "Fn::Sub": "assets-soap-pattern-${AWS::AccountId}"
+            },
             "S3Key": "dependencies.zip"
           },
-          "Description": "Depend?ncias da fun??o Lambda",
+          "Description": "Dependencias da funcao Lambda",
           "LayerName": "transformers",
           "CompatibleRuntimes": [
             "python3.9"
@@ -117,7 +112,10 @@
         },
         "Properties": {
           "Code": {
-            "S3Bucket": "assets-soap-pattern-${AWS::AccountId}",
+            "S3Bucket": 
+            {
+                "Fn::Sub": "assets-soap-pattern-${AWS::AccountId}"
+            },
             "S3Key": "lambda-code.zip"
           },
           "FunctionName": "xslt-transformer",
@@ -148,7 +146,7 @@
           ],
           "Layers": [
             {
-              "Ref": "DependendenciesLayer100f2af442"
+              "Ref": "DependendenciesLayer"
             }
           ]
         }
