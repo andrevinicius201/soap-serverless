@@ -75,7 +75,7 @@
                       "s3:GetObject"
                     ],
                     "Resource": {
-                      "Fn::Sub": "arn:aws:s3:::${S3Bucket}/*"
+                      "Fn::Sub": "arn:aws:s3:::soap-transformer-${AWS::AccountId}/*"
                     }
                   }
                 ]
@@ -131,10 +131,10 @@
           "Environment": {
             "Variables": {
               "xsltrq": {
-                "Fn::Sub": "s3://${S3Bucket}/xml2json.xslt"
+                "Fn::Sub": "s3://soap-transformer-${AWS::AccountId}/xml2json.xslt"
               },
               "xsltrs": {
-                "Fn::Sub": "s3://${S3Bucket}/json2xml.xslt"
+                "Fn::Sub": "s3://soap-transformer-${AWS::AccountId}/json2xml.xslt"
               }
             }
           },
