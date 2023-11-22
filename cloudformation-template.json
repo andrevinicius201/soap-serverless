@@ -1,12 +1,11 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "Template for xml and json payload conversion",
-    "Outputs": {
-      "BucketName": {
-        "Value": {
-          "Ref": "S3Bucket"
+    "Parameters" : {
+        "APIEndpoint" : {
+          "Type" : "String",
+          "Description" : "Enter the API endpoint that you need to connect with"
         }
-      }
     },
     "Resources": {
       "API": {
@@ -131,11 +130,14 @@
           "Environment": {
             "Variables": {
               "xsltrq": {
-                "Fn::Sub": "s3://soap-transformer-${AWS::AccountId}/xml2json.xslt"
+                "Fn::Sub": "s3://soap-transformer-${AWS::AccountId}/xslt/xml2json.xslt"
               },
               "xsltrs": {
-                "Fn::Sub": "s3://soap-transformer-${AWS::AccountId}/json2xml.xslt"
-              }
+                "Fn::Sub": "s3://soap-transformer-${AWS::AccountId}/xslt/json2xml.xslt"
+              },
+              "endpoint": {
+                "Ref" : "APIEndpoint"
+              } 
             }
           },
           "Tags": [
@@ -162,17 +164,6 @@
         },
         "Metadata": {
           "SamResourceId": "LambdaPolicyForAPIGW"
-        }
-      },
-      "S3Bucket": {
-        "Type": "AWS::S3::Bucket",
-        "Properties": {
-          "BucketName": {
-            "Fn::Sub": "soap-transformer-${AWS::AccountId}"
-          }
-        },
-        "Metadata": {
-          "SamResourceId": "S3Bucket"
         }
       },
       "APIDeployment4024e8f0fd": {
