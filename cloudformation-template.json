@@ -28,7 +28,7 @@
         "Properties": {
           "BodyS3Location": {
             "Bucket": "api-specification-aws",
-            "Key": "openapi"
+            "Key": "openapi.yaml"
           },
           "Parameters": {
             "endpointConfigurationTypes": "REGIONAL"
